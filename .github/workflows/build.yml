@@ -27,14 +27,6 @@ jobs:
     # This action checks-out your repository under $GITHUB_WORKSPACE, so your workflow can access it.
     - name: Checkout
       uses: actions/checkout@v4
-    # Cleanup The Actions Workspace Using Custom Composite Run Actions
-    - name: Clean-up
-      uses: rokibhasansagar/slimhub_actions@main
-    # Swap necessary memory for building
-    - name: Swap Space
-      uses: pierotofy/set-swap-space@master
-      with:
-        swap-size-gb: 12
     # Install necessary packages for building android kernel
     - name: Build Environment
       run: |
