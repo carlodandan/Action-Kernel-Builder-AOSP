@@ -1,0 +1,69 @@
+name: Kernel Builder
+
+on:
+  workflow_dispatch:
+    inputs:
+      MANIFEST_URL:
+        description: 'Kernel Manifest'
+        required: true
+        default: ''
+      MANIFEST_BRANCH:
+        description: 'Kernel Manifest Branch'
+        required: true
+        default: ''
+      BUILD_CONFIG:
+        description: 'Customized build.config file'
+        required: true
+        default: 'build.config'
+
+jobs:
+  build:
+    name: Build Kernel by ${{ github.actor }}
+    runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id
+    permissions:
+      contents: write
+    steps:
+    # This action checks-out your repository under $GITHUB_WORKSPACE, so your workflow can access it.
+    - name: Checkout
+      uses: actions/checkout@v4
+    # Cleanup The Actions Workspace Using Custom Composite Run Actions
+    - name: Clean-up
+      uses: rokibhasansagar/slimhub_actions@main
+    # Swap necessary memory for building
+    - name: Swap Space
+      uses: pierotofy/set-swap-space@master
+      with:
+        swap-size-gb: 12
+    # Install necessary packages for building android kernel
+    - name: Build Environment
+      run: |
+        sudo apt-get install bison flex rsync bison device-tree-compiler bc -y
+    # Install repo tool in case it was not yet installed
+    - name: Install Repo Tool
+      run: |
+        git config --global color.ui false
+        if ! command -v repo &> /dev/null; then
+            echo "'repo' command not found. Installing..."
+            mkdir -p ~/bin  # Create bin directory if it doesn't exist
+            curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+            chmod a+x ~/bin/repo
+            sudo ln -sf ~/bin/repo /usr/bin/repo
+            echo "'repo' command installed successfully."
+        else
+            echo "'repo' command already exists."
+        fi
+    # Initial the kernel manifest then sync after
+    - name: Initialize Manifest and Sync
+      run: |
+        mkdir -p android
+        cd android
+        git config --global user.name "${{ github.actor }}"
+        git config --global user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+        repo init -u ${{ github.event.inputs.MANIFEST }} -b ${{ github.event.inputs.MANIFEST_BRANCH }}
+        repo sync
+    # Starts the compiling process of android kernel
+    - name: Build Kernel
+      run: |
+        cd android
+        BUILD_CONFIG=${{ github.event.inputs.BUILD_CONFIG }} build/build.sh 2>&1 | tee build.log
