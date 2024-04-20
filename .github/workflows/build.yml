@@ -6,15 +6,15 @@ on:
       MANIFEST_URL:
         description: 'Kernel Manifest'
         required: true
-        default: ''
+        default: 'https://github.com/cd-Crypton/android_kernel-manifest'
       MANIFEST_BRANCH:
         description: 'Kernel Manifest Branch'
         required: true
-        default: ''
+        default: 'samsung/sm6375'
       BUILD_CONFIG:
         description: 'Customized build.config file'
         required: true
-        default: 'build.config'
+        default: 'sm6375/build.config.sm6375'
 
 jobs:
   build:
