@@ -59,3 +59,14 @@ jobs:
       run: |
         cd android
         BUILD_CONFIG=${{ github.event.inputs.BUILD_CONFIG }} build/build.sh 2>&1 | tee build.log
+    # Upload the release, if build is successful
+    - name: Upload to Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          android/arch/arm64/boot/Image*
+        name: Android Kernel Release | ${{ github.run_id }}
+        tag_name: ${{ github.run_id }}
+        body: |
+          ## Build Information
+          Manifest: ${{ github.event.inputs.MANIFEST_URL }}/tree/${{ github.event.inputs.MANIFEST_BRANCH }}
