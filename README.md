@@ -10,8 +10,10 @@ Compile using the kernel build script similar to how Android Open Souce Project 
 * Fork this repository.
 * Go to Action Tab, then in left side, you'll see workflows - tap Kernel Builder.
 * Click the `Run workflow` dropdown in right side of the screen, then complete the details needed.
-    * Kernel Manifest: Enter your kernel manifest URL.
-    * Kernel Manifest Branch: Enter your kernel manifest branch.
-    * Customized build.config file: Enter your customized build.config file here. (See pre-requisite above for details)
+    * `MANIFEST_URL`: Enter your kernel manifest URL.
+    * `MANIFEST_BRANCH`: Enter your kernel manifest branch.
+    * `BUILD_CONFIG`: Enter your customized build.config file here. (See pre-requisite above for details)
+    * `KERNEL_IMAGE_NAME`: Enter your target kernel image name.
+    * `ANYKERNEL3`: Just tick the box if you want to make a flashable kernel zip.
 * Then click the green button - `Run workflow`.
 * Check the release for the built kernel image.
