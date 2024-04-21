@@ -68,9 +68,18 @@ jobs:
       run: |
         cd android
         BUILD_CONFIG=${{ inputs.BUILD_CONFIG }} build/build.sh 2>&1 | tee build.log
+    # Check if the out directory consist of target kernel image
+    - name: Check Built Kernel
+      run: |
+       if find android/out -name "${{ inputs.KERNEL_IMAGE_NAME }}" | grep -q "${{ inputs.KERNEL_IMAGE_NAME }}"; then
+           echo "TARGET_KERNEL=true" >> $GITHUB_ENV
+       else
+           echo "Kernel output file is empty"
+           exit 1
+       fi
     # If true, create a flashable zip
     - name: Make a flashable zip file
-      if: inputs.ANYKERNEL3 == true
+      if: inputs.ANYKERNEL3 == true && env.TARGET_KERNEL == true
       continue-on-error: true
       run: |
         mkdir -p android/kernelbuild
@@ -86,6 +95,7 @@ jobs:
         zip -r9 UPDATE-AnyKernel3.zip * -x .git README.md *placeholder
     # Upload the release, if build is successful
     - name: Upload to Release
+      if: env.TARGET_KERNEL == true
       uses: softprops/action-gh-release@v1
       with:
         files: |
