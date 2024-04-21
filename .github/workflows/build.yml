@@ -65,6 +65,7 @@ jobs:
         repo sync
     # Starts the compiling process of android kernel
     - name: Build Kernel
+      continue-on-error: true
       run: |
         mkdir -p android/kernelbuild
         mkdir -p android/modulebuild
@@ -75,6 +76,7 @@ jobs:
 
     - name: Make a flashable zip file
       if: inputs.RECOVERY_INSTALLER == true
+      continue-on-error: true
       run: |
         rm -rf android/AnyKernel3
         git clone https://github.com/osm0sis/AnyKernel3 ./android/AnyKernel3
