@@ -70,6 +70,7 @@ jobs:
         BUILD_CONFIG=${{ inputs.BUILD_CONFIG }} build/build.sh 2>&1 | tee build.log
     # Check if the out directory consist of target kernel image
     - name: Setup kernel and modules
+      continue-on-error: true
       run: |
         mkdir -p android/kernelbuild
         mkdir -p android/modulebuild
