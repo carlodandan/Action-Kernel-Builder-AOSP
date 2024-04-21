@@ -15,6 +15,15 @@ on:
         description: 'Customized build.config file'
         required: true
         default: 'sm6375/build.config.sm6375'
+      KERNEL_IMAGE_NAME:
+        description: 'Image, Image.gz, Image.gz-dtb, etc.'
+        required: true
+        default: 'Image'
+      ANYKERNEL3:
+        description: 'Make flashable AnyKernel3 zip'
+        type: boolean
+        required: true
+        default: false
 
 jobs:
   build:
@@ -57,14 +66,31 @@ jobs:
     # Starts the compiling process of android kernel
     - name: Build Kernel
       run: |
+        mkdir -p android/kernelbuild
+        mkdir -p android/modulebuild
         cd android
         BUILD_CONFIG=${{ github.event.inputs.BUILD_CONFIG }} build/build.sh 2>&1 | tee build.log
+        mv $(find out -name '${{ github.event.inputs.KERNEL_IMAGE_NAME }}') kernelbuild
+        mv $(find out -name '*.ko') modulebuild
+
+    - name: Make a flashable zip file
+      if: github.event.inputs.RECOVERY_INSTALLER == true
+      run: |
+        rm -rf android/AnyKernel3
+        git clone https://github.com/osm0sis/AnyKernel3 ./android/AnyKernel3
+        mv script/anykernel.sh android/AnyKernel3
+        mv android/kernelbuild/${{ github.event.inputs.KERNEL_IMAGE_NAME }} android/AnyKernel3
+        mv android/modulebuild/*.ko android/AnyKernel3/modules/system/lib/modules
+        cd android/AnyKernel3
+        zip -r9 UPDATE-AnyKernel3.zip * -x .git README.md *placeholder
+
     # Upload the release, if build is successful
     - name: Upload to Release
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          android/out/arch/arm64/boot/Image*
+          android/kernelbuild/${{ github.event.inputs.KERNEL_IMAGE_NAME }}
+          android/AnyKernel3/UPDATE-AnyKernel3.zip
         name: Android Kernel Release | ${{ github.run_id }}
         tag_name: ${{ github.run_id }}
         body: |
