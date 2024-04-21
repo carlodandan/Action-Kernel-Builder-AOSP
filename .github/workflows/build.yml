@@ -61,7 +61,7 @@ jobs:
         cd android
         git config --global user.name "${{ github.actor }}"
         git config --global user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
-        repo init -u ${{ github.event.inputs.MANIFEST_URL }} -b ${{ github.event.inputs.MANIFEST_BRANCH }}
+        repo init -u ${{ inputs.MANIFEST_URL }} -b ${{ inputs.MANIFEST_BRANCH }}
         repo sync
     # Starts the compiling process of android kernel
     - name: Build Kernel
@@ -69,17 +69,17 @@ jobs:
         mkdir -p android/kernelbuild
         mkdir -p android/modulebuild
         cd android
-        BUILD_CONFIG=${{ github.event.inputs.BUILD_CONFIG }} build/build.sh 2>&1 | tee build.log
-        mv $(find out -name '${{ github.event.inputs.KERNEL_IMAGE_NAME }}') kernelbuild
+        BUILD_CONFIG=${{ inputs.BUILD_CONFIG }} build/build.sh 2>&1 | tee build.log
+        mv $(find out -name '${{ inputs.KERNEL_IMAGE_NAME }}') kernelbuild
         mv $(find out -name '*.ko') modulebuild
 
     - name: Make a flashable zip file
-      if: github.event.inputs.RECOVERY_INSTALLER == true
+      if: inputs.RECOVERY_INSTALLER == true
       run: |
         rm -rf android/AnyKernel3
         git clone https://github.com/osm0sis/AnyKernel3 ./android/AnyKernel3
         mv script/anykernel.sh android/AnyKernel3
-        mv android/kernelbuild/${{ github.event.inputs.KERNEL_IMAGE_NAME }} android/AnyKernel3
+        mv android/kernelbuild/${{ inputs.KERNEL_IMAGE_NAME }} android/AnyKernel3
         mv android/modulebuild/*.ko android/AnyKernel3/modules/system/lib/modules
         cd android/AnyKernel3
         zip -r9 UPDATE-AnyKernel3.zip * -x .git README.md *placeholder
@@ -89,10 +89,10 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          android/kernelbuild/${{ github.event.inputs.KERNEL_IMAGE_NAME }}
+          android/kernelbuild/${{ inputs.KERNEL_IMAGE_NAME }}
           android/AnyKernel3/UPDATE-AnyKernel3.zip
         name: Android Kernel Release | ${{ github.run_id }}
         tag_name: ${{ github.run_id }}
         body: |
           ## Build Information
-          Manifest: ${{ github.event.inputs.MANIFEST_URL }}/tree/${{ github.event.inputs.MANIFEST_BRANCH }}
+          Manifest: ${{ inputs.MANIFEST_URL }}/tree/${{ inputs.MANIFEST_BRANCH }}
