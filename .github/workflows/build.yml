@@ -86,11 +86,11 @@ jobs:
         mkdir -p android/modulebuild
         mv -f $(find android/out -name '${{ inputs.KERNEL_IMAGE_NAME }}') kernelbuild 2>/dev/null
         mv -f $(find android/out -name '*.ko') modulebuild 2>/dev/null
-        rm -rf android/AnyKernel3
-        git clone https://github.com/osm0sis/AnyKernel3 ./android/AnyKernel3
+        cd android && rm -rf AnyKernel3
+        git clone https://github.com/osm0sis/AnyKernel3 -b master && cd ..
         mv -f script/anykernel.sh android/AnyKernel3 2>/dev/null
-        mv -f android/kernelbuild/${{ inputs.KERNEL_IMAGE_NAME }} android/AnyKernel3 2>/dev/null
-        mv -f android/modulebuild/*.ko android/AnyKernel3/modules/system/lib/modules 2>/dev/null
+        cp -rf android/kernelbuild/${{ inputs.KERNEL_IMAGE_NAME }} android/AnyKernel3
+        cp -rf android/modulebuild/*.ko android/AnyKernel3/modules/system/lib/modules
         cd android/AnyKernel3
         zip -r9 UPDATE-AnyKernel3.zip * -x .git README.md *placeholder
     # Upload the release, if build is successful
