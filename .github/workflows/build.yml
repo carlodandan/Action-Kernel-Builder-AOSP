@@ -75,7 +75,7 @@ jobs:
         mv -f $(find out -name '*.ko') modulebuild 2>/dev/null
 
     - name: Make a flashable zip file
-      if: inputs.RECOVERY_INSTALLER == true
+      if: inputs.ANYKERNEL3 == true
       continue-on-error: true
       run: |
         rm -rf android/AnyKernel3
