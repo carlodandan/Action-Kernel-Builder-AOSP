@@ -65,19 +65,18 @@ jobs:
         repo sync
     # Starts the compiling process of android kernel
     - name: Build Kernel
-      continue-on-error: true
       run: |
-        mkdir -p android/kernelbuild
-        mkdir -p android/modulebuild
         cd android
         BUILD_CONFIG=${{ inputs.BUILD_CONFIG }} build/build.sh 2>&1 | tee build.log
-        mv -f $(find out -name '${{ inputs.KERNEL_IMAGE_NAME }}') kernelbuild 2>/dev/null
-        mv -f $(find out -name '*.ko') modulebuild 2>/dev/null
-
+    # If true, create a flashable zip
     - name: Make a flashable zip file
       if: inputs.ANYKERNEL3 == true
       continue-on-error: true
       run: |
+        mkdir -p android/kernelbuild
+        mkdir -p android/modulebuild
+        mv -f $(find android/out -name '${{ inputs.KERNEL_IMAGE_NAME }}') kernelbuild 2>/dev/null
+        mv -f $(find android/out -name '*.ko') modulebuild 2>/dev/null
         rm -rf android/AnyKernel3
         git clone https://github.com/osm0sis/AnyKernel3 ./android/AnyKernel3
         mv -f script/anykernel.sh android/AnyKernel3 2>/dev/null
@@ -85,7 +84,6 @@ jobs:
         mv -f android/modulebuild/*.ko android/AnyKernel3/modules/system/lib/modules 2>/dev/null
         cd android/AnyKernel3
         zip -r9 UPDATE-AnyKernel3.zip * -x .git README.md *placeholder
-
     # Upload the release, if build is successful
     - name: Upload to Release
       uses: softprops/action-gh-release@v1
