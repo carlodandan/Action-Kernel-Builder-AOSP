@@ -74,8 +74,8 @@ jobs:
       run: |
         mkdir -p android/kernelbuild
         mkdir -p android/modulebuild
-        cp -f $(find android/out -name '${{ inputs.KERNEL_IMAGE_NAME }}') android/kernelbuild/ 2>/dev/null
-        cp -f $(find android/out -name '*.ko') android/modulebuild/ 2>/dev/null
+        cp -nf $(find android/out -name '${{ inputs.KERNEL_IMAGE_NAME }}') android/kernelbuild/ 2>/dev/null
+        cp -nf $(find android/out -name '*.ko') android/modulebuild/ 2>/dev/null
         cd android/kernelbuild && ls && cd ../..
         cd android/modulebuild && ls && cd ../..
     # If true, create a flashable zip
