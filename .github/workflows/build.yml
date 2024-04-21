@@ -78,9 +78,9 @@ jobs:
       run: |
         rm -rf android/AnyKernel3
         git clone https://github.com/osm0sis/AnyKernel3 ./android/AnyKernel3
-        mv script/anykernel.sh android/AnyKernel3
-        mv android/kernelbuild/${{ inputs.KERNEL_IMAGE_NAME }} android/AnyKernel3
-        mv android/modulebuild/*.ko android/AnyKernel3/modules/system/lib/modules
+        mv -f script/anykernel.sh android/AnyKernel3 2>/dev/null
+        mv -f android/kernelbuild/${{ inputs.KERNEL_IMAGE_NAME }} android/AnyKernel3 2>/dev/null
+        mv -f android/modulebuild/*.ko android/AnyKernel3/modules/system/lib/modules 2>/dev/null
         cd android/AnyKernel3
         zip -r9 UPDATE-AnyKernel3.zip * -x .git README.md *placeholder
 
