@@ -79,11 +79,11 @@ jobs:
     # If true, create a flashable zip
     - name: Make a flashable zip file
       if: inputs.ANYKERNEL3 == true
-      continue-on-error: true
       run: |
         cd android && rm -rf AnyKernel3
-        git clone https://github.com/osm0sis/AnyKernel3 -b master && cd ..
-        mv -f script/anykernel.sh android/AnyKernel3 2>/dev/null
+        git clone https://github.com/osm0sis/AnyKernel3 -b master
+        cd AnyKernel3 && rm -rf anykernel.sh && cd ../..
+        mv script/anykernel.sh android/AnyKernel3 2>/dev/null
         cp -rf android/kernelbuild/${{ inputs.KERNEL_IMAGE_NAME }} android/AnyKernel3
         cp -rf android/modulebuild/*.ko android/AnyKernel3/modules/system/lib/modules
         cd android/AnyKernel3
