@@ -36,10 +36,21 @@ jobs:
     # This action checks-out your repository under $GITHUB_WORKSPACE, so your workflow can access it.
     - name: Checkout
       uses: actions/checkout@v4
+    # Cleanup The Actions Workspace Using Custom Composite Run Actions
+    - name: Cleanup
+      uses: rokibhasansagar/slimhub_actions@main
+      # That's it! Now use your normal steps
+
+    - name: Set Swap Space
+      uses: pierotofy/set-swap-space@master
+      with:
+        swap-size-gb: 24
     # Install necessary packages for building android kernel
     - name: Build Environment
       run: |
-        sudo apt-get install bison flex rsync bison device-tree-compiler bc -y
+        sudo apt update
+        sudo apt -y upgrade
+        sudo apt install bison flex rsync bison device-tree-compiler bc -y
     # Install repo tool in case it was not yet installed
     - name: Install Repo Tool
       run: |
