@@ -10,15 +10,15 @@ on:
       MANIFEST_BRANCH:
         description: 'Kernel Manifest Branch'
         required: true
-        default: 'samsung/sm6375'
+        default: 'realme/sm6225'
       BUILD_CONFIG:
         description: 'Customized build.config file'
         required: true
-        default: 'sm6375/build.config.sm6375'
+        default: 'sm6225/build.config.sm6225'
       KERNEL_IMAGE_NAME:
         description: 'Image, Image.gz, Image.gz-dtb, etc.'
         required: true
-        default: 'Image'
+        default: 'Image.gz'
       ANYKERNEL3:
         description: 'Make flashable AnyKernel3 zip'
         type: boolean
@@ -28,7 +28,7 @@ on:
 jobs:
   build:
     name: Build Kernel by ${{ github.actor }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     if: github.event.repository.owner.id == github.event.sender.id
     permissions:
       contents: write
@@ -36,20 +36,10 @@ jobs:
     # This action checks-out your repository under $GITHUB_WORKSPACE, so your workflow can access it.
     - name: Checkout
       uses: actions/checkout@v4
-    # Cleanup The Actions Workspace Using Custom Composite Run Actions
-    - name: Cleanup
-      uses: rokibhasansagar/slimhub_actions@main
-      # That's it! Now use your normal steps
-
-    - name: Set Swap Space
-      uses: pierotofy/set-swap-space@master
-      with:
-        swap-size-gb: 24
     # Install necessary packages for building android kernel
     - name: Build Environment
       run: |
-        sudo apt update
-        sudo apt -y upgrade
+        sudo apt update -y
         sudo apt install bison flex rsync bison device-tree-compiler bc -y
     # Install repo tool in case it was not yet installed
     - name: Install Repo Tool
@@ -72,7 +62,7 @@ jobs:
         cd android
         git config --global user.name "${{ github.actor }}"
         git config --global user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
-        repo init -u ${{ inputs.MANIFEST_URL }} -b ${{ inputs.MANIFEST_BRANCH }}
+        repo init --depth=1 -u ${{ inputs.MANIFEST_URL }} -b ${{ inputs.MANIFEST_BRANCH }}
         repo sync
     # Starts the compiling process of android kernel
     - name: Build Kernel
