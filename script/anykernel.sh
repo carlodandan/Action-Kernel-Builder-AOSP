@@ -21,7 +21,7 @@ set_perm_recursive 0 0 750 750 $ramdisk/init* $ramdisk/sbin;
 } # end attributes
 
 # boot shell variables
-block=auto;
+block=/dev/block/bootdevice/by-name/boot; # Note that this is the common boot block path for QCOM devices. Feel free to edit this.
 is_slot_device=auto;
 ramdisk_compression=auto;
 patch_vbmeta_flag=auto;
