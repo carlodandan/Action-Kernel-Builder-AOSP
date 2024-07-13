@@ -79,35 +79,18 @@ jobs:
         cd android
         BUILD_CONFIG="${{ inputs.BUILD_CONFIG }}" build/build.sh 2>&1 | tee build.log
     # Check if the out directory consist of target kernel image
-    - name: Setup kernel and modules
+    - name: Setup kernel
       continue-on-error: true
       run: |
         mkdir -p android/kernelbuild
         mkdir -p android/modulebuild
-        cp -nf $(find android/out -name '${{ inputs.KERNEL_IMAGE_NAME }}') android/kernelbuild/ 2>/dev/null
-        cp -nf $(find android/out -name '*.ko') android/modulebuild/ 2>/dev/null
-        cd android/kernelbuild && ls && cd ../..
-        cd android/modulebuild && ls && cd ../..
-    # If true, create a flashable zip
-    - name: Make a flashable zip file
-      if: inputs.ANYKERNEL3 == true
-      run: |
-        cd android && rm -rf AnyKernel3
-        git clone https://github.com/osm0sis/AnyKernel3 -b master
-        cd AnyKernel3 && rm -rf anykernel.sh && cd ../..
-        mv script/anykernel.sh android/AnyKernel3/ 2>/dev/null
-        cp -rf android/kernelbuild/${{ inputs.KERNEL_IMAGE_NAME }} android/AnyKernel3/
-        cp -rf android/modulebuild/* android/AnyKernel3/modules/system/lib/modules/
-        cd android/AnyKernel3
-        zip -r9 UPDATE-AnyKernel3.zip * -x .git README.md *placeholder
+        cp -nf $(find android/out -name '${{ inputs.KERNEL_IMAGE_NAME }}*') android/kernelbuild/ 2>/dev/null
     # Upload the release, if build is successful
     - name: Upload to Release
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          android/kernelbuild/${{ inputs.KERNEL_IMAGE_NAME }}
-          android/AnyKernel3/UPDATE-AnyKernel3.zip
-          android/out/msm-kernel-bengal-consolidate/gki_kernel/common/arch/arm64/boot/Image*
+          android/kernelbuild/${{ inputs.KERNEL_IMAGE_NAME }}*
         name: Android Kernel Release | ${{ github.run_id }}
         tag_name: ${{ github.run_id }}
         body: |
