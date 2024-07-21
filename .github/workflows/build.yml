@@ -84,9 +84,9 @@ jobs:
       run: |
         mkdir -p android/kernelbuild
         mkdir -p android/modulebuild
-        cp -nf $(find android/out -name '${{ inputs.KERNEL_IMAGE_NAME }}') android/kernelbuild/ 2>/dev/null
-        cp -nf $(find android/out -name '${{ inputs.KERNEL_IMAGE_NAME }}.gz') android/kernelbuild/ 2>/dev/null
-        cp -nf $(find android/out -name '${{ inputs.KERNEL_IMAGE_NAME }}.lz4') android/kernelbuild/ 2>/dev/null
+        cp -nf $(find android -name '${{ inputs.KERNEL_IMAGE_NAME }}') android/kernelbuild/ 2>/dev/null
+        cp -nf $(find android -name '${{ inputs.KERNEL_IMAGE_NAME }}.gz') android/kernelbuild/ 2>/dev/null
+        cp -nf $(find android -name '${{ inputs.KERNEL_IMAGE_NAME }}.lz4') android/kernelbuild/ 2>/dev/null
     # Upload the release, if build is successful
     - name: Upload to Release
       uses: softprops/action-gh-release@v1
